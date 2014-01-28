@@ -3,14 +3,27 @@ var gaze = require('gaze');
 var debounce = require('lodash.debounce');
 
 module.exports = function(pattern, cmd){
-  function runner(event, filepath){
+  var running = false
+  var runAgain = false
+
+  function runner() {
+    if (running) {
+      runAgain = true
+      return
+    }
     console.log('Running: '+ cmd);
+    running = true
     exec(cmd, function(err, stdout, stderr){
+      running = false
       if (err) {
         console.log(err);
       }
       console.log(stdout);
       console.log(stderr);
+      if (runAgain) {
+        runAgain = false
+        runner()
+      }
     });
   }
 
